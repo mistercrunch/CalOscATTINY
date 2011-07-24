@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1311474443 source:/home/mistercrunch/Code/Codeblocks/CalOscATTINY/main.c
+	<avr/io.h>
+	<util/delay.h>
+	<avr/interrupt.h>
+

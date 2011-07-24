@@ -1,0 +1,168 @@
+
+bin/Debug/CalOscATTINY.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000c4  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000002  00800100  00800100  00000138  2**0
+                  ALLOC
+  2 .stab         00000ad4  00000000  00000000  00000138  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      000007da  00000000  00000000  00000c0c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	13 c0       	rjmp	.+38     	; 0x28 <__ctors_end>
+   2:	22 c0       	rjmp	.+68     	; 0x48 <__bad_interrupt>
+   4:	21 c0       	rjmp	.+66     	; 0x48 <__bad_interrupt>
+   6:	20 c0       	rjmp	.+64     	; 0x48 <__bad_interrupt>
+   8:	1f c0       	rjmp	.+62     	; 0x48 <__bad_interrupt>
+   a:	1e c0       	rjmp	.+60     	; 0x48 <__bad_interrupt>
+   c:	1d c0       	rjmp	.+58     	; 0x48 <__bad_interrupt>
+   e:	1c c0       	rjmp	.+56     	; 0x48 <__bad_interrupt>
+  10:	1b c0       	rjmp	.+54     	; 0x48 <__bad_interrupt>
+  12:	1a c0       	rjmp	.+52     	; 0x48 <__bad_interrupt>
+  14:	19 c0       	rjmp	.+50     	; 0x48 <__bad_interrupt>
+  16:	3d c0       	rjmp	.+122    	; 0x92 <__vector_11>
+  18:	17 c0       	rjmp	.+46     	; 0x48 <__bad_interrupt>
+  1a:	16 c0       	rjmp	.+44     	; 0x48 <__bad_interrupt>
+  1c:	15 c0       	rjmp	.+42     	; 0x48 <__bad_interrupt>
+  1e:	14 c0       	rjmp	.+40     	; 0x48 <__bad_interrupt>
+  20:	13 c0       	rjmp	.+38     	; 0x48 <__bad_interrupt>
+  22:	12 c0       	rjmp	.+36     	; 0x48 <__bad_interrupt>
+  24:	11 c0       	rjmp	.+34     	; 0x48 <__bad_interrupt>
+  26:	10 c0       	rjmp	.+32     	; 0x48 <__bad_interrupt>
+
+00000028 <__ctors_end>:
+  28:	11 24       	eor	r1, r1
+  2a:	1f be       	out	0x3f, r1	; 63
+  2c:	cf ef       	ldi	r28, 0xFF	; 255
+  2e:	d1 e0       	ldi	r29, 0x01	; 1
+  30:	de bf       	out	0x3e, r29	; 62
+  32:	cd bf       	out	0x3d, r28	; 61
+
+00000034 <__do_clear_bss>:
+  34:	11 e0       	ldi	r17, 0x01	; 1
+  36:	a0 e0       	ldi	r26, 0x00	; 0
+  38:	b1 e0       	ldi	r27, 0x01	; 1
+  3a:	01 c0       	rjmp	.+2      	; 0x3e <.do_clear_bss_start>
+
+0000003c <.do_clear_bss_loop>:
+  3c:	1d 92       	st	X+, r1
+
+0000003e <.do_clear_bss_start>:
+  3e:	a2 30       	cpi	r26, 0x02	; 2
+  40:	b1 07       	cpc	r27, r17
+  42:	e1 f7       	brne	.-8      	; 0x3c <.do_clear_bss_loop>
+  44:	02 d0       	rcall	.+4      	; 0x4a <main>
+  46:	3c c0       	rjmp	.+120    	; 0xc0 <_exit>
+
+00000048 <__bad_interrupt>:
+  48:	db cf       	rjmp	.-74     	; 0x0 <__vectors>
+
+0000004a <main>:
+
+volatile int nbOVF;
+
+int main(void)
+{
+    TCCR0A &=  0b11110111;//ctc normal
+  4a:	e5 e4       	ldi	r30, 0x45	; 69
+  4c:	f0 e0       	ldi	r31, 0x00	; 0
+  4e:	80 81       	ld	r24, Z
+  50:	87 7f       	andi	r24, 0xF7	; 247
+  52:	80 83       	st	Z, r24
+    TCCR0A |=  0b00000001;//no prescaler
+  54:	80 81       	ld	r24, Z
+  56:	81 60       	ori	r24, 0x01	; 1
+  58:	80 83       	st	Z, r24
+    nbOVF = 0;
+  5a:	10 92 01 01 	sts	0x0101, r1
+  5e:	10 92 00 01 	sts	0x0100, r1
+    for(;;)
+    {
+        if(nbOVF==122)
+        {
+            //122 overflows (8MHZ / 65536 ) should be every second
+            PORTB |= 0b00000000;
+  62:	e5 e2       	ldi	r30, 0x25	; 37
+  64:	f0 e0       	ldi	r31, 0x00	; 0
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+  66:	20 e2       	ldi	r18, 0x20	; 32
+  68:	3e e4       	ldi	r19, 0x4E	; 78
+            nbOVF = 0;
+            _delay_ms(5);
+            PORTB |= 0b11111111;
+  6a:	4f ef       	ldi	r20, 0xFF	; 255
+    TCCR0A &=  0b11110111;//ctc normal
+    TCCR0A |=  0b00000001;//no prescaler
+    nbOVF = 0;
+    for(;;)
+    {
+        if(nbOVF==122)
+  6c:	80 91 00 01 	lds	r24, 0x0100
+  70:	90 91 01 01 	lds	r25, 0x0101
+  74:	8a 37       	cpi	r24, 0x7A	; 122
+  76:	91 05       	cpc	r25, r1
+  78:	c9 f7       	brne	.-14     	; 0x6c <main+0x22>
+        {
+            //122 overflows (8MHZ / 65536 ) should be every second
+            PORTB |= 0b00000000;
+  7a:	80 81       	ld	r24, Z
+  7c:	80 83       	st	Z, r24
+            nbOVF = 0;
+  7e:	10 92 01 01 	sts	0x0101, r1
+  82:	10 92 00 01 	sts	0x0100, r1
+  86:	c9 01       	movw	r24, r18
+  88:	01 97       	sbiw	r24, 0x01	; 1
+  8a:	f1 f7       	brne	.-4      	; 0x88 <main+0x3e>
+            _delay_ms(5);
+            PORTB |= 0b11111111;
+  8c:	80 81       	ld	r24, Z
+  8e:	40 83       	st	Z, r20
+  90:	ed cf       	rjmp	.-38     	; 0x6c <main+0x22>
+
+00000092 <__vector_11>:
+    }
+    return 0;
+}
+
+
+SIGNAL(TIMER1_OVF_vect ){
+  92:	1f 92       	push	r1
+  94:	0f 92       	push	r0
+  96:	0f b6       	in	r0, 0x3f	; 63
+  98:	0f 92       	push	r0
+  9a:	11 24       	eor	r1, r1
+  9c:	8f 93       	push	r24
+  9e:	9f 93       	push	r25
+    //16bit, overflows at every 65536 cycles
+    //
+    nbOVF +=1;
+  a0:	80 91 00 01 	lds	r24, 0x0100
+  a4:	90 91 01 01 	lds	r25, 0x0101
+  a8:	01 96       	adiw	r24, 0x01	; 1
+  aa:	90 93 01 01 	sts	0x0101, r25
+  ae:	80 93 00 01 	sts	0x0100, r24
+}
+  b2:	9f 91       	pop	r25
+  b4:	8f 91       	pop	r24
+  b6:	0f 90       	pop	r0
+  b8:	0f be       	out	0x3f, r0	; 63
+  ba:	0f 90       	pop	r0
+  bc:	1f 90       	pop	r1
+  be:	18 95       	reti
+
+000000c0 <_exit>:
+  c0:	f8 94       	cli
+
+000000c2 <__stop_program>:
+  c2:	ff cf       	rjmp	.-2      	; 0xc2 <__stop_program>
